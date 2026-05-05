@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADU Configurator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Meta Pixel -->
+  <script>
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+  document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '1275302601354008');
+  fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=1275302601354008&ev=PageView&noscript=1"/></noscript>
+  <!-- End Meta Pixel -->
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      font-family: 'Inter', sans-serif;
+      background: #fff;
+      color: #1a1a1a;
+    }
+
+    .configurator {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    /* ── Progress ── */
+    .progress-track {
+      height: 4px;
+      background: #f0f0f0;
+      flex-shrink: 0;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #EE582B;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    /* ── Layout ── */
+    .main-layout {
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (min-width: 1024px) {
+      .configurator {
+        max-width: 720px;
+        margin: 0 auto;
+        box-shadow: 0 2px 24px rgba(0,0,0,0.08);
+      }
+    }
+
+    /* ── Image panel ── */
+    .image-panel {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      background: #f0ede8;
+    }
+    #step-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: opacity 0.3s ease;
+    }
+
+    /* ── Config panel ── */
+    .config-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 48px 44px;
+      min-width: 0;
+    }
+    @media (max-width: 1023px) {
+      .config-panel { padding: 28px 20px 40px; }
+    }
+
+    #step-content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Step text ── */
+    .step-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 6px;
+      line-height: 1.25;
+    }
+    .step-subtitle {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    /* ── Options grid ── */
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .options-grid > .option-btn:last-child:nth-child(odd) {
+      grid-column: span 2;
+    }
+
+    .option-btn {
+      padding: 14px 16px;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 8px;
+      background: #fff;
+      color: #333;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      line-height: 1.4;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+    }
+    .option-btn:hover:not(.selected) { border-color: #EE582B; }
+    .option-btn.selected {
+      background: #EE582B;
+      border-color: #EE582B;
+      color: #fff;
+    }
+    .btn-label { display: block; font-weight: 600; font-size: 14px; }
+    .btn-detail { display: block; font-size: 12px; margin-top: 3px; opacity: 0.72; }
+
+    /* ── Yes/No ── */
+    .yesno-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    /* ── Nav ── */
+    .nav-area {
+      margin-top: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .btn-next {
+      width: 100%;
+      padding: 15px 20px;
+      background: #EE582B;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn-next:not(:disabled):hover { opacity: 0.88; }
+    .btn-next:disabled { opacity: 0.28; cursor: not-allowed; }
+    .btn-back {
+      width: 100%;
+      padding: 13px 20px;
+      background: transparent;
+      color: #666;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-back:hover { border-color: #aaa; color: #333; }
+
+    /* ── Lead form ── */
+    .lead-form {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .form-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+    .form-group input {
+      padding: 12px 14px;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      color: #1a1a1a;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .form-group input:focus { border-color: #EE582B; }
+    .form-group input::placeholder { color: #c0c0c0; }
+
+    /* ── Results ── */
+    .res-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+    .res-total {
+      font-size: 42px;
+      font-weight: 700;
+      color: #EE582B;
+      line-height: 1;
+      margin-bottom: 32px;
+    }
+    .res-rows {
+      border-top: 1.5px solid #f0f0f0;
+      padding-top: 20px;
+      margin-bottom: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .res-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .res-row-label { font-size: 14px; color: #888; }
+    .res-row-value { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+    .res-row--sub { padding-left: 12px; }
+    .res-row--sub .res-row-label { font-size: 13px; color: #bbb; }
+    .res-row--sub .res-row-value { font-size: 13px; font-weight: 500; color: #999; }
+    .res-message {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.65;
+      margin-bottom: 24px;
+    }
+    .btn-cta {
+      display: block;
+      width: 100%;
+      padding: 15px 20px;
+      background: #EE582B;
+      color: #fff;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn-cta:hover { opacity: 0.88; }
+  </style>
+</head>
+<body>
+  <div class="configurator">
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <div class="main-layout">
+      <div class="image-panel">
+        <img id="step-image"
+             src="https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d2011ebfb8f9fc476d.png"
+             alt="ADU preview">
+      </div>
+      <div class="config-panel">
+        <div id="step-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ─── DATA ─────────────────────────────────────────────────────────────────
+
+    let imageTimer = null;
+
+    const LAYOUTS = [
+      { label: '500 sqft',  sqft: 500,  price: 142500, image: 'https://placehold.co/1280x720/E8E4E0/555555?text=500+sqft' },
+      { label: '600 sqft',  sqft: 600,  price: 166200, image: 'https://placehold.co/1280x720/DFE5E8/555555?text=600+sqft' },
+      { label: '749 sqft',  sqft: 749,  price: 202230, image: 'https://placehold.co/1280x720/E8E0E8/555555?text=749+sqft' },
+      { label: '850 sqft',  sqft: 850,  price: 212500, image: 'https://placehold.co/1280x720/E0E8E0/555555?text=850+sqft' },
+      { label: '1,000 sqft', sqft: 1000, price: 250000, image: 'https://placehold.co/1280x720/E8E8E0/555555?text=1000+sqft' },
+      { label: '1,200 sqft', sqft: 1200, price: 300000, image: 'https://placehold.co/1280x720/E0E3E8/555555?text=1200+sqft' },
+    ];
+
+    const EXTERIORS = [
+      { label: 'Stucco',                    detail: 'Any color \u00b7 $17/sqft',  costPerSqft: 17, image: 'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d2011ebfb8f9fc476d.png' },
+      { label: 'Sidings',                   detail: '$25/sqft',                   costPerSqft: 25, image: 'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d2011ebfb8f9fc476f.png' },
+      { label: 'Fire-resistant sidings',    detail: 'Any color \u00b7 $35/sqft',  costPerSqft: 35, image: 'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d2011ebfb8f9fc4770.png' },
+    ];
+
+    const FLOORINGS = [
+      { label: 'Vinyl',                    detail: '$8/sqft',  costPerSqft: 8,  image: 'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d2eecc3af70ad84311.jpg' },
+      { label: 'Tile',                     detail: '$17/sqft', costPerSqft: 17, image: 'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d3d696846120c6803d.jpg' },
+      { label: 'Engineered wood flooring', detail: '$19/sqft', costPerSqft: 19, image: 'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d267b2088f50ee69a9.jpg' },
+    ];
+
+    // ─── STEP IMAGES ──────────────────────────────────────────────────────────
+    const STEP_IMAGES = {
+      kitchenIsland: {
+        yes: 'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d240534248c57bf362.png',
+        no:  'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d2011ebfb8f9fc4772.png',
+      },
+      garageAppliance: {
+        no:    'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d267b2088f50ee69ad.png',
+        small: 'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d240534248c57bf35c.png',
+        big:   'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d2eecc3af70ad84319.png',
+      },
+      linen: {
+        no:    'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d2011ebfb8f9fc4771.png',
+        small: 'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d240534248c57bf364.png',
+        big:   'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d240534248c57bf365.png',
+      },
+      porch: {
+        yes: 'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d3d696846120c6803f.png',
+        no:  'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d267b2088f50ee69aa.png',
+      },
+      garage: {
+        no:      'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d2eecc3af70ad84314.png',
+        onecar:  'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d240534248c57bf361.png',
+        storage: 'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d2eecc3af70ad84312.png',
+      },
+    };
+
+    // ─── CONFIG ───────────────────────────────────────────────────────────────
+    const PIXEL_ID        = '1275302601354008';
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZ751yh-j9iZVPdzrXu_eaUc4q9m9_W-x4wG6PmIFf6W6whtfQLhCOEgReUHUcp0O6/exec';
+
+    // ─── STATE ────────────────────────────────────────────────────────────────
+    // Screens: 0=Layout 1=Exterior 2=Flooring 3=KitchenIsland 4=GarageAppliance
+    //          5=Linen 6=Porch 7=Garage 8=LeadForm 9=Results
+
+    let currentScreen = 0;
+    let selections = {
+      layout:          LAYOUTS[0],
+      exterior:        'Stucco',
+      flooring:        'Vinyl',
+      kitchenIsland:   'No',
+      garageAppliance: 'No',
+      linen:           'No',
+      porch:           'No',
+      garage:          'No garage',
+    };
+
+    // ─── HELPERS ──────────────────────────────────────────────────────────────
+
+    function fmt(n) {
+      return '$' + n.toLocaleString('en-US');
+    }
+
+    function switchImage(src) {
+      const img = document.getElementById('step-image');
+      clearTimeout(imageTimer);
+      img.style.opacity = '0';
+      imageTimer = setTimeout(() => { img.src = src; img.style.opacity = '1'; }, 300);
+    }
+
+    function updateProgress() {
+      const pct = Math.min((currentScreen / 8) * 100, 100);
+      document.getElementById('progress-fill').style.width = pct + '%';
+    }
+
+    function setContent(html) {
+      document.getElementById('step-content').innerHTML = html;
+      const panel = document.querySelector('.config-panel');
+      if (panel) panel.scrollTop = 0;
+    }
+
+    function calcTotal() {
+      if (!selections.layout) return null;
+      const { sqft, price: base } = selections.layout;
+      const extObj = EXTERIORS.find(e => e.label === selections.exterior);
+      const flrObj = FLOORINGS.find(f => f.label === selections.flooring);
+      const exterior        = extObj ? extObj.costPerSqft * sqft : 0;
+      const flooring        = flrObj ? flrObj.costPerSqft * sqft : 0;
+      const kitchenIsland   = selections.kitchenIsland === 'No' ? 0 : (sqft <= 749 ? 11200 : 15200);
+      const garageAppliance = { 'No': 0, 'Small': 3500, 'Big': 6500 }[selections.garageAppliance] ?? 0;
+      const linen           = { 'No': 0, 'Small linen closet': 2500, 'Big linen closet': 5000 }[selections.linen] ?? 0;
+      const porch           = selections.porch === 'No' ? 0 : (sqft <= 600 ? 8000 : sqft <= 850 ? 12000 : 18000);
+      const garage          = { 'No garage': 0, '1-car garage': 40000, '1-car garage with extra storage': 45000 }[selections.garage] ?? 0;
+      const addons = exterior + flooring + kitchenIsland + garageAppliance + linen + porch + garage;
+      return { base, exterior, flooring, kitchenIsland, garageAppliance, linen, porch, garage, addons, total: base + addons };
+    }
+
+    // ─── RENDER ───────────────────────────────────────────────────────────────
+
+    function renderStep() {
+      updateProgress();
+
+      const STEP_NAMES = ['Layout','Exterior','Flooring','KitchenIsland',
+                          'GarageAppliance','Linen','Porch','Garage','LeadForm','Results'];
+      if (typeof fbq !== 'undefined') {
+        fbq('trackCustom', 'ConfiguratorStep', {
+          step_number: currentScreen,
+          step_name: STEP_NAMES[currentScreen] || String(currentScreen),
+        });
+      }
+
+      switch (currentScreen) {
+        case 0: renderLayout();          break;
+        case 1: renderExterior();        break;
+        case 2: renderFlooring();        break;
+        case 3: renderKitchenIsland();   break;
+        case 4: renderGarageAppliance(); break;
+        case 5: renderLinen();           break;
+        case 6: renderPorch();           break;
+        case 7: renderGarage();          break;
+        case 8: renderLeadForm();        break;
+        case 9: renderResults();         break;
+      }
+    }
+
+    // Step 0 — Layout
+    function renderLayout() {
+      const btns = LAYOUTS.map((l, i) => {
+        const sel = selections.layout && selections.layout.sqft === l.sqft;
+        return `<button class="option-btn${sel ? ' selected' : ''}" onclick="selectLayout(${i})">
+          <span class="btn-label">${l.label}</span>
+          <span class="btn-detail">${fmt(l.price)}</span>
+        </button>`;
+      }).join('');
+
+      setContent(`
+        <h2 class="step-title">Select your layout</h2>
+        <p class="step-subtitle">Choose the floor plan that fits your needs and property.</p>
+        <div class="options-grid">${btns}</div>
+        <div class="nav-area">
+          <button class="btn-next" onclick="goNext()" ${selections.layout ? '' : 'disabled'}>Next &rarr;</button>
+        </div>
+      `);
+
+      if (selections.layout) switchImage(selections.layout.image);
+    }
+
+    function selectLayout(idx) {
+      selections.layout = LAYOUTS[idx];
+      renderStep();
+    }
+
+    // Step 1 — Exterior
+    function renderExterior() {
+      const btns = EXTERIORS.map((e, i) => {
+        const sel = selections.exterior === e.label;
+        return `<button class="option-btn${sel ? ' selected' : ''}" onclick="selectExterior(${i})">
+          <span class="btn-label">${e.label}</span>
+          <span class="btn-detail">${e.detail}</span>
+        </button>`;
+      }).join('');
+
+      setContent(`
+        <h2 class="step-title">Choose your exterior</h2>
+        <p class="step-subtitle">All finishes include premium weather sealing.</p>
+        <div class="options-grid">${btns}</div>
+        <div class="nav-area">
+          <button class="btn-next" onclick="goNext()">Next &rarr;</button>
+          <button class="btn-back" onclick="goBack()">&larr; Back</button>
+        </div>
+      `);
+
+      const sel = EXTERIORS.find(e => e.label === selections.exterior);
+      if (sel) switchImage(sel.image);
+    }
+
+    function selectExterior(idx) {
+      selections.exterior = EXTERIORS[idx].label;
+      renderStep();
+    }
+
+    // Step 2 — Flooring
+    function renderFlooring() {
+      const btns = FLOORINGS.map((f, i) => {
+        const sel = selections.flooring === f.label;
+        return `<button class="option-btn${sel ? ' selected' : ''}" onclick="selectFlooring(${i})">
+          <span class="btn-label">${f.label}</span>
+          <span class="btn-detail">${f.detail}</span>
+        </button>`;
+      }).join('');
+
+      setContent(`
+        <h2 class="step-title">Choose your flooring</h2>
+        <p class="step-subtitle">Pricing is per square foot based on your selected layout.</p>
+        <div class="options-grid">${btns}</div>
+        <div class="nav-area">
+          <button class="btn-next" onclick="goNext()">Next &rarr;</button>
+          <button class="btn-back" onclick="goBack()">&larr; Back</button>
+        </div>
+      `);
+
+      const sel = FLOORINGS.find(f => f.label === selections.flooring);
+      if (sel) switchImage(sel.image);
+    }
+
+    function selectFlooring(idx) {
+      selections.flooring = FLOORINGS[idx].label;
+      renderStep();
+    }
+
+    // Step 3 — Kitchen Island
+    function renderKitchenIsland() {
+      const sqft = selections.layout.sqft;
+      const price = sqft <= 749 ? 11200 : 15200;
+      switchImage(selections.kitchenIsland === 'Yes' ? STEP_IMAGES.kitchenIsland.yes : STEP_IMAGES.kitchenIsland.no);
+      const yesSel = selections.kitchenIsland === 'Yes';
+      const noSel  = selections.kitchenIsland === 'No';
+      setContent(`
+        <h2 class="step-title">Kitchen island?</h2>
+        <p class="step-subtitle">Extra counter space and storage built into your kitchen.</p>
+        <div class="yesno-grid">
+          <button class="option-btn${yesSel ? ' selected' : ''}" onclick="selectKitchenIsland('Yes')">
+            <span class="btn-label">Yes, add it</span>
+            <span class="btn-detail">+${fmt(price)} flat</span>
+          </button>
+          <button class="option-btn${noSel ? ' selected' : ''}" onclick="selectKitchenIsland('No')">
+            <span class="btn-label">No thanks</span>
+            <span class="btn-detail">Keep standard</span>
+          </button>
+        </div>
+        <div class="nav-area">
+          <button class="btn-next" onclick="goNext()">Next &rarr;</button>
+          <button class="btn-back" onclick="goBack()">&larr; Back</button>
+        </div>
+      `);
+    }
+
+    function selectKitchenIsland(val) {
+      selections.kitchenIsland = val;
+      renderStep();
+    }
+
+    // Step 4 — Garage Appliance Package
+    function renderGarageAppliance() {
+      const opts = [
+        { val: 'No',    label: 'No appliance',            detail: '$0',        img: STEP_IMAGES.garageAppliance.no    },
+        { val: 'Small', label: 'Small appliance package', detail: '+$3,500',   img: STEP_IMAGES.garageAppliance.small },
+        { val: 'Big',   label: 'Big appliance package',   detail: '+$6,500',   img: STEP_IMAGES.garageAppliance.big   },
+      ];
+      const cur = opts.find(o => o.val === selections.garageAppliance) || opts[0];
+      switchImage(cur.img);
+      const btns = opts.map(o => `
+        <button class="option-btn${selections.garageAppliance === o.val ? ' selected' : ''}"
+                onclick="selectGarageAppliance('${o.val}')">
+          <span class="btn-label">${o.label}</span>
+          <span class="btn-detail">${o.detail}</span>
+        </button>`).join('');
+      setContent(`
+        <h2 class="step-title">Garage appliance package?</h2>
+        <p class="step-subtitle">Washer/dryer package installed in the garage.</p>
+        <div class="options-grid">${btns}</div>
+        <div class="nav-area">
+          <button class="btn-next" onclick="goNext()">Next &rarr;</button>
+          <button class="btn-back" onclick="goBack()">&larr; Back</button>
+        </div>
+      `);
+    }
+
+    function selectGarageAppliance(val) {
+      selections.garageAppliance = val;
+      renderStep();
+    }
+
+    // Step 5 — Linen Closet
+    function renderLinen() {
+      const opts = [
+        { val: 'No',                label: 'No linen closet',  detail: '$0',      img: STEP_IMAGES.linen.no    },
+        { val: 'Small linen closet', label: 'Small linen closet', detail: '+$2,500', img: STEP_IMAGES.linen.small },
+        { val: 'Big linen closet',   label: 'Big linen closet',   detail: '+$5,000', img: STEP_IMAGES.linen.big   },
+      ];
+      const cur = opts.find(o => o.val === selections.linen) || opts[0];
+      switchImage(cur.img);
+      const btns = opts.map(o => `
+        <button class="option-btn${selections.linen === o.val ? ' selected' : ''}"
+                onclick="selectLinen('${o.val}')">
+          <span class="btn-label">${o.label}</span>
+          <span class="btn-detail">${o.detail}</span>
+        </button>`).join('');
+      setContent(`
+        <h2 class="step-title">Linen closet?</h2>
+        <p class="step-subtitle">Built-in linen storage for linens and towels.</p>
+        <div class="options-grid">${btns}</div>
+        <div class="nav-area">
+          <button class="btn-next" onclick="goNext()">Next &rarr;</button>
+          <button class="btn-back" onclick="goBack()">&larr; Back</button>
+        </div>
+      `);
+    }
+
+    function selectLinen(val) {
+      selections.linen = val;
+      renderStep();
+    }
+
+    // Step 6 — Porch
+    function renderPorch() {
+      const sqft = selections.layout.sqft;
+      const price = sqft <= 600 ? 8000 : sqft <= 850 ? 12000 : 18000;
+      switchImage(selections.porch === 'Yes' ? STEP_IMAGES.porch.yes : STEP_IMAGES.porch.no);
+      const yesSel = selections.porch === 'Yes';
+      const noSel  = selections.porch === 'No';
+      setContent(`
+        <h2 class="step-title">Add a porch?</h2>
+        <p class="step-subtitle">A covered outdoor space at the entrance of your ADU.</p>
+        <div class="yesno-grid">
+          <button class="option-btn${yesSel ? ' selected' : ''}" onclick="selectPorch('Yes')">
+            <span class="btn-label">Yes, add it</span>
+            <span class="btn-detail">+${fmt(price)} flat</span>
+          </button>
+          <button class="option-btn${noSel ? ' selected' : ''}" onclick="selectPorch('No')">
+            <span class="btn-label">No thanks</span>
+            <span class="btn-detail">Skip upgrade</span>
+          </button>
+        </div>
+        <div class="nav-area">
+          <button class="btn-next" onclick="goNext()">Next &rarr;</button>
+          <button class="btn-back" onclick="goBack()">&larr; Back</button>
+        </div>
+      `);
+    }
+
+    function selectPorch(val) {
+      selections.porch = val;
+      renderStep();
+    }
+
+    // Step 7 — Garage
+    function renderGarage() {
+      const opts = [
+        { val: 'No garage',                        label: 'No garage',                     detail: '$0',       img: STEP_IMAGES.garage.no      },
+        { val: '1-car garage',                     label: '1-car garage',                  detail: '+$40,000', img: STEP_IMAGES.garage.onecar  },
+        { val: '1-car garage with extra storage',  label: '1-car garage + extra storage',  detail: '+$45,000', img: STEP_IMAGES.garage.storage },
+      ];
+      const cur = opts.find(o => o.val === selections.garage) || opts[0];
+      switchImage(cur.img);
+      const btns = opts.map(o => `
+        <button class="option-btn${selections.garage === o.val ? ' selected' : ''}"
+                onclick="selectGarage('${o.val}')">
+          <span class="btn-label">${o.label}</span>
+          <span class="btn-detail">${o.detail}</span>
+        </button>`).join('');
+      setContent(`
+        <h2 class="step-title">Add a garage?</h2>
+        <p class="step-subtitle">Attached single-car garage, optionally with extra storage.</p>
+        <div class="options-grid">${btns}</div>
+        <div class="nav-area">
+          <button class="btn-next" onclick="goNext()">Next &rarr;</button>
+          <button class="btn-back" onclick="goBack()">&larr; Back</button>
+        </div>
+      `);
+    }
+
+    function selectGarage(val) {
+      selections.garage = val;
+      renderStep();
+    }
+
+    // Step 8 — Lead form
+    function renderLeadForm() {
+      if (selections.layout) switchImage(selections.layout.image);
+      setContent(`
+        <h2 class="step-title">Almost there</h2>
+        <p class="step-subtitle">Enter your details to receive your personalized quote.</p>
+        <form class="lead-form" onsubmit="submitForm(event)">
+          <div class="form-fields">
+            <div class="form-group">
+              <label for="f-firstname">First Name</label>
+              <input type="text" id="f-firstname" placeholder="Jane" required autocomplete="given-name">
+            </div>
+            <div class="form-group">
+              <label for="f-lastname">Last Name</label>
+              <input type="text" id="f-lastname" placeholder="Smith" required autocomplete="family-name">
+            </div>
+            <div class="form-group">
+              <label for="f-email">Email</label>
+              <input type="email" id="f-email" placeholder="jane@example.com" required autocomplete="email">
+            </div>
+            <div class="form-group">
+              <label for="f-phone">Phone</label>
+              <input type="tel" id="f-phone" placeholder="(555) 000-0000" required autocomplete="tel">
+            </div>
+            <div class="form-group">
+              <label for="f-zip">Zip Code</label>
+              <input type="text" id="f-zip" placeholder="90210" required
+                pattern="[0-9]{5}" title="Enter a 5-digit zip code"
+                autocomplete="postal-code" maxlength="5" inputmode="numeric">
+            </div>
+          </div>
+          <div class="nav-area">
+            <button type="submit" class="btn-next">Get My Free Quote</button>
+          </div>
+        </form>
+      `);
+    }
+
+    function submitForm(e) {
+      e.preventDefault();
+
+      const firstName = document.getElementById('f-firstname').value.trim();
+      const lastName  = document.getElementById('f-lastname').value.trim();
+      const email     = document.getElementById('f-email').value.trim();
+      const phone     = document.getElementById('f-phone').value.trim();
+      const zip       = document.getElementById('f-zip').value.trim();
+
+      if (typeof fbq !== 'undefined') {
+        fbq('init', PIXEL_ID, { em: email, ph: phone });
+        fbq('track', 'Lead', {
+          content_name: 'ADU Configurator',
+          currency: 'USD',
+          value: calcTotal().total,
+        });
+      }
+
+      fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          timestamp:       new Date().toISOString(),
+          firstName,
+          lastName,
+          email,
+          phone,
+          zip,
+          layout:          selections.layout ? selections.layout.label : '',
+          exterior:        selections.exterior,
+          flooring:        selections.flooring,
+          kitchenIsland:   selections.kitchenIsland,
+          garageAppliance: selections.garageAppliance,
+          linen:           selections.linen,
+          porch:           selections.porch,
+          garage:          selections.garage,
+          estimatedTotal:  calcTotal().total,
+        }),
+      }).catch(() => {});
+
+      currentScreen = 9;
+      renderStep();
+    }
+
+    // Step 9 — Results
+    function renderResults() {
+      const calc = calcTotal();
+      const extObj = EXTERIORS.find(e => e.label === selections.exterior);
+      if (extObj) switchImage(extObj.image);
+
+      const baseTotal = calc.base + calc.exterior + calc.flooring;
+      const addonsTotal = calc.kitchenIsland + calc.garageAppliance + calc.linen + calc.porch + calc.garage;
+
+      setContent(`
+        <p class="res-label">Total ADU Cost</p>
+        <p class="res-total">${fmt(calc.total)}</p>
+        <div class="res-rows">
+          <div class="res-row">
+            <span class="res-row-label">Base price</span>
+            <span class="res-row-value">${fmt(baseTotal)}</span>
+          </div>
+          <div class="res-row">
+            <span class="res-row-label">Add-ons</span>
+            <span class="res-row-value">${fmt(addonsTotal)}</span>
+          </div>
+        </div>
+        <p class="res-message">Thank you for showing interest in our ADU builds! If this price works for you, tap the button below to book a call.</p>
+        <a href="https://calendly.com" target="_blank" rel="noopener" class="btn-cta">Book a Site Visit</a>
+      `);
+    }
+
+    // ─── ACTIONS ──────────────────────────────────────────────────────────────
+
+    function goNext() {
+      if (currentScreen < 8) { currentScreen++; renderStep(); }
+    }
+
+    function goBack() {
+      if (currentScreen > 0) { currentScreen--; renderStep(); }
+    }
+
+    // ─── INIT ─────────────────────────────────────────────────────────────────
+    document.getElementById('step-image').src = LAYOUTS[0].image;
+    renderStep();
+  </script>
+</body>
+</html>
+
