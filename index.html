@@ -8,7 +8,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <script src="https://link.nexcon.com/js/form_embed.js"></script>
 
   <style>
     *, *::before, *::after {
@@ -257,7 +256,7 @@
 
     .hero h1 {
       font-family: var(--font-display);
-      font-size: clamp(3rem, 5vw, 5rem);
+      font-size: clamp(2.2rem, 3.4vw, 3.2rem);
       font-weight: 700;
       line-height: 1.06;
       color: var(--white);
@@ -1159,24 +1158,26 @@
 <!-- ─── MODAL SCRIPT ─── -->
 <script>
   (function () {
-    const overlay  = document.getElementById('formModalOverlay');
-    const closeBtn = document.getElementById('closeFormModal');
+    const overlay    = document.getElementById('formModalOverlay');
+    const closeBtn   = document.getElementById('closeFormModal');
     const formIframe = document.getElementById('inline-9HF7LSQDthtlUeyCOCt3-modal');
-    let formLoaded = false;
+    let formLoaded   = false;
 
-    function openModal() {
+    function loadForm() {
       if (!formLoaded) {
         formIframe.src = formIframe.dataset.src;
         formLoaded = true;
       }
+    }
+
+    function openModal() {
+      loadForm();
       overlay.classList.add('open');
-      document.body.style.overflow = 'hidden';
       closeBtn.focus();
     }
 
     function closeModal() {
       overlay.classList.remove('open');
-      document.body.style.overflow = '';
     }
 
     document.querySelectorAll('.open-modal').forEach(function (btn) {
@@ -1192,6 +1193,13 @@
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
     });
+
+    // Pre-load form in background once page is idle so it's ready on first click
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(loadForm, { timeout: 4000 });
+    } else {
+      setTimeout(loadForm, 3000);
+    }
   })();
 </script>
 
