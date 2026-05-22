@@ -70,14 +70,20 @@
       aspect-ratio: 16 / 9;
       overflow: hidden;
       background: #f0ede8;
+      position: relative;
     }
-    #step-image {
+    .step-image {
+      position: absolute;
+      inset: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
-      transition: opacity 0.3s ease;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      will-change: opacity;
     }
+    .step-image.active { opacity: 1; }
 
     /* ── Config panel ── */
     .config-panel {
@@ -286,11 +292,7 @@
       <div class="progress-fill" id="progress-fill"></div>
     </div>
     <div class="main-layout">
-      <div class="image-panel">
-        <img id="step-image"
-             src="https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d2011ebfb8f9fc476d.png"
-             alt="ADU preview">
-      </div>
+      <div class="image-panel" id="image-panel"></div>
       <div class="config-panel">
         <div id="step-content"></div>
       </div>
@@ -300,7 +302,7 @@
   <script>
     // ─── DATA ─────────────────────────────────────────────────────────────────
 
-    let imageTimer = null;
+    const imageMap = new Map();
 
     const LAYOUTS = [
       { label: '500 sqft',  sqft: 500,  price: 142500, image: 'https://placehold.co/1280x720/E8E4E0/555555?text=500+sqft' },
@@ -376,11 +378,36 @@
       return '$' + n.toLocaleString('en-US');
     }
 
+    function renderImageLayers() {
+      const panel = document.getElementById('image-panel');
+      const urls = new Set();
+      LAYOUTS.forEach(l => urls.add(l.image));
+      EXTERIORS.forEach(e => urls.add(e.image));
+      FLOORINGS.forEach(f => urls.add(f.image));
+      Object.values(STEP_IMAGES).forEach(group =>
+        Object.values(group).forEach(u => urls.add(u))
+      );
+
+      const initial = LAYOUTS[0].image;
+      urls.forEach(url => {
+        const img = document.createElement('img');
+        img.className = 'step-image' + (url === initial ? ' active' : '');
+        img.src = url;
+        img.alt = '';
+        img.loading = 'eager';
+        img.decoding = 'async';
+        if (url === initial) img.fetchPriority = 'high';
+        panel.appendChild(img);
+        imageMap.set(url, img);
+      });
+    }
+
     function switchImage(src) {
-      const img = document.getElementById('step-image');
-      clearTimeout(imageTimer);
-      img.style.opacity = '0';
-      imageTimer = setTimeout(() => { img.src = src; img.style.opacity = '1'; }, 300);
+      const next = imageMap.get(src);
+      if (!next || next.classList.contains('active')) return;
+      const cur = document.querySelector('.step-image.active');
+      if (cur && cur !== next) cur.classList.remove('active');
+      next.classList.add('active');
     }
 
     function updateProgress() {
@@ -799,7 +826,7 @@
     }
 
     // ─── INIT ─────────────────────────────────────────────────────────────────
-    document.getElementById('step-image').src = LAYOUTS[0].image;
+    renderImageLayers();
     renderStep();
   </script>
 </body>
