@@ -621,12 +621,12 @@
     let imageTimer = null;
 
     const LAYOUTS = [
-      { label: '500 sqft',  sqft: 500,  price: 142500, image: 'https://placehold.co/1280x720/E8E4E0/555555?text=500+sqft' },
-      { label: '600 sqft',  sqft: 600,  price: 166200, image: 'https://placehold.co/1280x720/DFE5E8/555555?text=600+sqft' },
-      { label: '749 sqft',  sqft: 749,  price: 202230, image: 'https://placehold.co/1280x720/E8E0E8/555555?text=749+sqft' },
-      { label: '850 sqft',  sqft: 850,  price: 212500, image: 'https://placehold.co/1280x720/E0E8E0/555555?text=850+sqft' },
-      { label: '1,000 sqft', sqft: 1000, price: 250000, image: 'https://placehold.co/1280x720/E8E8E0/555555?text=1000+sqft' },
-      { label: '1,200 sqft', sqft: 1200, price: 300000, image: 'https://placehold.co/1280x720/E0E3E8/555555?text=1200+sqft' },
+      { label: 'Studio',         sqft: 320,  price: 142500, image: 'models/320,1-b.png' },
+      { label: '1 Bed · 1 Bath', sqft: 498,  price: 166200, image: 'models/1b1b498.png' },
+      { label: '1 Bed · 1 Bath', sqft: 645,  price: 202230, image: 'models/1b1b645.png' },
+      { label: '1 Bed · 1 Bath', sqft: 748,  price: 212500, image: 'models/2b1b748.png' },
+      { label: '2 Bed · 1 Bath', sqft: 1200, price: 250000, image: 'models/2b1b1200.png' },
+      { label: '3 Bed · 2 Bath', sqft: 1200, price: 300000, image: 'models/3b2b1200.png' },
     ];
 
     const EXTERIORS = [
@@ -744,10 +744,10 @@
 
     function renderLayout() {
       const btns = LAYOUTS.map((l, i) => {
-        const sel = selections.layout && selections.layout.sqft === l.sqft;
+        const sel = selections.layout === l;
         return `<button class="option-btn${sel ? ' selected' : ''}" onclick="selectLayout(${i})">
           <span class="btn-label">${l.label}</span>
-          <span class="btn-detail">${fmt(l.price)}</span>
+          <span class="btn-detail">${l.sqft.toLocaleString()} sq ft</span>
         </button>`;
       }).join('');
       setContent(`
