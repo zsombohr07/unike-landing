@@ -293,18 +293,23 @@
       flex-direction: column;
     }
     .image-panel {
+      position: relative;
       width: 100%;
       aspect-ratio: 16 / 9;
       overflow: hidden;
       background: #f0ede8;
     }
-    #step-image {
+    .step-img {
+      position: absolute;
+      inset: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
-      transition: opacity 0.3s ease;
+      opacity: 0;
+      transition: opacity 0.35s ease;
     }
+    .step-img.is-active { opacity: 1; }
     .config-panel {
       flex: 1;
       display: flex;
@@ -523,9 +528,8 @@
         </div>
         <div class="main-layout">
           <div class="image-panel">
-            <img id="step-image"
-                 src="https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d2011ebfb8f9fc476d.png"
-                 alt="ADU preview">
+            <img class="step-img is-active" id="step-image-a" alt="ADU preview">
+            <img class="step-img"           id="step-image-b" alt="" aria-hidden="true">
           </div>
           <div class="config-panel">
             <div id="step-content"></div>
@@ -618,8 +622,6 @@
   <script>
     // ─── CONFIGURATOR ─────────────────────────────────────────────────────────
 
-    let imageTimer = null;
-
     const LAYOUTS = [
       { label: 'Studio',         sqft: 320,  price: 142500, image: 'models2/1.png' },
       { label: '1 Bed · 1 Bath', sqft: 498,  price: 166200, image: 'models2/2.png' },
@@ -684,11 +686,26 @@
 
     function fmt(n) { return '$' + n.toLocaleString('en-US'); }
 
+    let activeLayer = 'a';
+    let switchSeq = 0;
     function switchImage(src) {
-      const img = document.getElementById('step-image');
-      clearTimeout(imageTimer);
-      img.style.opacity = '0';
-      imageTimer = setTimeout(() => { img.src = src; img.style.opacity = '1'; }, 300);
+      const cur = document.getElementById('step-image-' + activeLayer);
+      if (cur.dataset.src === src) return;
+      const myseq = ++switchSeq;
+      const nextLayer = activeLayer === 'a' ? 'b' : 'a';
+      const next = document.getElementById('step-image-' + nextLayer);
+      const reveal = () => {
+        if (myseq !== switchSeq) return;          // a newer switch superseded us
+        next.src = src; next.dataset.src = src;
+        next.classList.add('is-active');
+        cur.classList.remove('is-active');
+        activeLayer = nextLayer;
+      };
+      const tmp = new Image();
+      tmp.src = src;
+      if (tmp.complete) reveal();
+      else if (tmp.decode) tmp.decode().then(reveal).catch(reveal);
+      else tmp.onload = reveal;
     }
 
     function updateProgress() {
@@ -1040,7 +1057,20 @@
     function goNext() { if (currentScreen < 8) { currentScreen++; renderStep(); } }
     function goBack()  { if (currentScreen > 0) { currentScreen--; renderStep(); } }
 
-    document.getElementById('step-image').src = LAYOUTS[0].image;
+    // Preload every configurator image so crossfades decode instantly.
+    (function preloadImages() {
+      const urls = [
+        ...LAYOUTS.map(l => l.image),
+        ...EXTERIORS.map(e => e.image),
+        ...FLOORINGS.map(f => f.image),
+        ...Object.values(STEP_IMAGES).flatMap(group => Object.values(group)),
+      ];
+      urls.forEach(url => { const i = new Image(); i.src = url; });
+    })();
+
+    const layerA = document.getElementById('step-image-a');
+    layerA.src = LAYOUTS[0].image;
+    layerA.dataset.src = LAYOUTS[0].image;
     renderStep();
 
     // ─── TESTIMONIALS ─────────────────────────────────────────────────────────
