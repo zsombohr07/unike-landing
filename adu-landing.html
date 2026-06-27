@@ -633,24 +633,24 @@
     // ─── CONFIGURATOR ─────────────────────────────────────────────────────────
 
     const LAYOUTS = [
-      { label: 'Studio',         sqft: 320,  price: 160000, image: 'models2/1.png' },
+      { label: 'Studio',         sqft: 320,  price: 144000, image: 'models2/1.png' },
       { label: '1 Bed · 1 Bath', sqft: 498,  price: 190000, image: 'models2/2.png' },
       { label: '1 Bed · 1 Bath', sqft: 645,  price: 212850, image: 'models2/3.png' },
       { label: '1 Bed · 1 Bath', sqft: 748,  price: 246840, image: 'models2/4.png' },
       { label: '2 Bed · 1 Bath', sqft: 1200, price: 396000, image: 'models2/5.png' },
-      { label: '3 Bed · 2 Bath', sqft: 1200, price: 396000, image: 'models2/6.png' },
+      { label: '3 Bed · 2 Bath', sqft: 1200, price: 420000, image: 'models2/6.png' },
     ];
 
     const EXTERIORS = [
-      { label: 'Stucco',                    detail: 'Included',  costPerSqft: 17, image: 'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d2011ebfb8f9fc476d.png' },
-      { label: 'Sidings',                   detail: '$25/sqft',                   costPerSqft: 25, image: 'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d2011ebfb8f9fc476f.png' },
-      { label: 'Fire-resistant sidings',    detail: 'Any color · $35/sqft',  costPerSqft: 35, image: 'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d2011ebfb8f9fc4770.png' },
+      { label: 'Stucco',                    detail: 'Included',  costPerSqft: 0, image: 'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d2011ebfb8f9fc476d.png' },
+      { label: 'Sidings',                   detail: '$8/sqft',                   costPerSqft: 8, image: 'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d2011ebfb8f9fc476f.png' },
+      { label: 'Fire-resistant sidings',    detail: 'Any color · $18/sqft',  costPerSqft: 18, image: 'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d2011ebfb8f9fc4770.png' },
     ];
 
     const FLOORINGS = [
-      { label: 'Vinyl',                    detail: 'Included',  costPerSqft: 8,  image: 'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d2eecc3af70ad84311.jpg' },
-      { label: 'Tile',                     detail: '$17/sqft', costPerSqft: 17, image: 'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d3d696846120c6803d.jpg' },
-      { label: 'Engineered wood flooring', detail: '$19/sqft', costPerSqft: 19, image: 'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d267b2088f50ee69a9.jpg' },
+      { label: 'Vinyl',                    detail: 'Included',  costPerSqft: 0,  image: 'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d2eecc3af70ad84311.jpg' },
+      { label: 'Tile',                     detail: '$9/sqft', costPerSqft: 9, image: 'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d3d696846120c6803d.jpg' },
+      { label: 'Engineered wood flooring', detail: '$11/sqft', costPerSqft: 11, image: 'https://assets.cdn.filesafe.space/LrYTQ7DeVqkiDSMDLL92/media/69f070d267b2088f50ee69a9.jpg' },
     ];
 
     const STEP_IMAGES = {
@@ -687,10 +687,10 @@
       layout:          LAYOUTS[0],
       exterior:        'Stucco',
       flooring:        'Vinyl',
-      kitchenIsland:   'No',
+      kitchenIsland:   'None',
       garageAppliance: 'No',
       linen:           'No',
-      porch:           'No',
+      porch:           'None',
       garage:          'No garage',
     };
 
@@ -736,10 +736,10 @@
       const flrObj = FLOORINGS.find(f => f.label === selections.flooring);
       const exterior        = extObj ? extObj.costPerSqft * sqft : 0;
       const flooring        = flrObj ? flrObj.costPerSqft * sqft : 0;
-      const kitchenIsland   = selections.kitchenIsland === 'No' ? 0 : (sqft <= 749 ? 11200 : 15200);
-      const garageAppliance = { 'No': 0, 'Small': 3500, 'Big': 6500 }[selections.garageAppliance] ?? 0;
-      const linen           = { 'No': 0, 'Small linen closet': 2500, 'Big linen closet': 5000 }[selections.linen] ?? 0;
-      const porch           = selections.porch === 'No' ? 0 : (sqft <= 600 ? 8000 : sqft <= 850 ? 12000 : 18000);
+      const kitchenIsland   = { 'None': 0, 'Standard': 7500, 'Chef': 12000 }[selections.kitchenIsland] ?? 0;
+      const garageAppliance = { 'No': 0, 'Small': 500, 'Big': 1500 }[selections.garageAppliance] ?? 0;
+      const linen           = { 'No': 0, 'Small linen closet': 500, 'Big linen closet': 1500 }[selections.linen] ?? 0;
+      const porch           = { 'None': 0, 'Standard': 8000, 'Large': 12000 }[selections.porch] ?? 0;
       const garage          = { 'No garage': 0, '1-car garage': 40000, '1-car garage with extra storage': 45000 }[selections.garage] ?? 0;
       const addons = exterior + flooring + kitchenIsland + garageAppliance + linen + porch + garage;
       return { base, exterior, flooring, kitchenIsland, garageAppliance, linen, porch, garage, addons, total: base + addons };
@@ -834,24 +834,23 @@
     function selectFlooring(idx) { selections.flooring = FLOORINGS[idx].label; renderStep(); }
 
     function renderKitchenIsland() {
-      const sqft = selections.layout.sqft;
-      const price = sqft <= 749 ? 11200 : 15200;
-      switchImage(selections.kitchenIsland === 'Yes' ? STEP_IMAGES.kitchenIsland.yes : STEP_IMAGES.kitchenIsland.no);
-      const yesSel = selections.kitchenIsland === 'Yes';
-      const noSel  = selections.kitchenIsland === 'No';
+      const opts = [
+        { val: 'None',     label: 'No island',       detail: '$0',       img: STEP_IMAGES.kitchenIsland.no  },
+        { val: 'Standard', label: 'Standard island', detail: '+$7,500',  img: STEP_IMAGES.kitchenIsland.yes },
+        { val: 'Chef',     label: "Chef's island",   detail: '+$12,000', img: STEP_IMAGES.kitchenIsland.yes },
+      ];
+      const cur = opts.find(o => o.val === selections.kitchenIsland) || opts[0];
+      switchImage(cur.img);
+      const btns = opts.map(o => `
+        <button class="option-btn${selections.kitchenIsland === o.val ? ' selected' : ''}"
+                onclick="selectKitchenIsland('${o.val}')">
+          <span class="btn-label">${o.label}</span>
+          <span class="btn-detail">${o.detail}</span>
+        </button>`).join('');
       setContent(`
         <h2 class="step-title">Kitchen island?</h2>
         <p class="step-subtitle">Extra counter space and storage built into your kitchen.</p>
-        <div class="yesno-grid">
-          <button class="option-btn${yesSel ? ' selected' : ''}" onclick="selectKitchenIsland('Yes')">
-            <span class="btn-label">Yes, add it</span>
-            <span class="btn-detail">+${fmt(price)} flat</span>
-          </button>
-          <button class="option-btn${noSel ? ' selected' : ''}" onclick="selectKitchenIsland('No')">
-            <span class="btn-label">No thanks</span>
-            <span class="btn-detail">Keep standard</span>
-          </button>
-        </div>
+        <div class="options-grid">${btns}</div>
         <div class="nav-area">
           <button class="btn-next" onclick="goNext()">Next &rarr;</button>
           <button class="btn-back" onclick="goBack()">&larr; Back</button>
@@ -863,8 +862,8 @@
     function renderGarageAppliance() {
       const opts = [
         { val: 'No',    label: 'No appliance',            detail: '$0',        img: STEP_IMAGES.garageAppliance.no    },
-        { val: 'Small', label: 'Small appliance package', detail: '+$3,500',   img: STEP_IMAGES.garageAppliance.small },
-        { val: 'Big',   label: 'Big appliance package',   detail: '+$6,500',   img: STEP_IMAGES.garageAppliance.big   },
+        { val: 'Small', label: 'Small appliance package', detail: '+$500',     img: STEP_IMAGES.garageAppliance.small },
+        { val: 'Big',   label: 'Big appliance package',   detail: '+$1,500',   img: STEP_IMAGES.garageAppliance.big   },
       ];
       const cur = opts.find(o => o.val === selections.garageAppliance) || opts[0];
       switchImage(cur.img);
@@ -889,8 +888,8 @@
     function renderLinen() {
       const opts = [
         { val: 'No',                 label: 'No linen closet',     detail: '$0',      img: STEP_IMAGES.linen.no    },
-        { val: 'Small linen closet', label: 'Small linen closet',  detail: '+$2,500', img: STEP_IMAGES.linen.small },
-        { val: 'Big linen closet',   label: 'Big linen closet',    detail: '+$5,000', img: STEP_IMAGES.linen.big   },
+        { val: 'Small linen closet', label: 'Small linen closet',  detail: '+$500',   img: STEP_IMAGES.linen.small },
+        { val: 'Big linen closet',   label: 'Big linen closet',    detail: '+$1,500', img: STEP_IMAGES.linen.big   },
       ];
       const cur = opts.find(o => o.val === selections.linen) || opts[0];
       switchImage(cur.img);
@@ -913,24 +912,23 @@
     function selectLinen(val) { selections.linen = val; renderStep(); }
 
     function renderPorch() {
-      const sqft = selections.layout.sqft;
-      const price = sqft <= 600 ? 8000 : sqft <= 850 ? 12000 : 18000;
-      switchImage(selections.porch === 'Yes' ? STEP_IMAGES.porch.yes : STEP_IMAGES.porch.no);
-      const yesSel = selections.porch === 'Yes';
-      const noSel  = selections.porch === 'No';
+      const opts = [
+        { val: 'None',     label: 'No porch',        detail: '$0',       img: STEP_IMAGES.porch.no  },
+        { val: 'Standard', label: 'Standard porch',  detail: '+$8,000',  img: STEP_IMAGES.porch.yes },
+        { val: 'Large',    label: 'Large porch',     detail: '+$12,000', img: STEP_IMAGES.porch.yes },
+      ];
+      const cur = opts.find(o => o.val === selections.porch) || opts[0];
+      switchImage(cur.img);
+      const btns = opts.map(o => `
+        <button class="option-btn${selections.porch === o.val ? ' selected' : ''}"
+                onclick="selectPorch('${o.val}')">
+          <span class="btn-label">${o.label}</span>
+          <span class="btn-detail">${o.detail}</span>
+        </button>`).join('');
       setContent(`
         <h2 class="step-title">Add a porch?</h2>
         <p class="step-subtitle">A covered outdoor space at the entrance of your ADU.</p>
-        <div class="yesno-grid">
-          <button class="option-btn${yesSel ? ' selected' : ''}" onclick="selectPorch('Yes')">
-            <span class="btn-label">Yes, add it</span>
-            <span class="btn-detail">+${fmt(price)} flat</span>
-          </button>
-          <button class="option-btn${noSel ? ' selected' : ''}" onclick="selectPorch('No')">
-            <span class="btn-label">No thanks</span>
-            <span class="btn-detail">Skip upgrade</span>
-          </button>
-        </div>
+        <div class="options-grid">${btns}</div>
         <div class="nav-area">
           <button class="btn-next" onclick="goNext()">Next &rarr;</button>
           <button class="btn-back" onclick="goBack()">&larr; Back</button>
